@@ -25,8 +25,8 @@ def create_network(conn, name, forward_dev, forward_mode, gateway_ip, net_mask, 
                          dhcp_end_ip=end_ip,
                          )
     network_obj = conn.networkDefineXML(network_xml)    # Define an inactive persistent virtual network
-    network_obj.setAutostart(1)
-    network_obj.create()
+    network_obj.setAutostart(1)     # set the network auto start
+    network_obj.create()    # set the network active
 
 
 if __name__ == '__main__':

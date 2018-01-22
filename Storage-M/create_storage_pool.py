@@ -16,11 +16,11 @@ def create_storage_pool(conn, name, path):
     </pool>""".format(name=name, path=path)
 
     # create a new persistent storage pool
-    pool = conn.storagePoolCreateXML(xmlDesc)
-
+    pool = conn.storagePoolDefineXML(xmlDesc)
     # set storage pool autostart
     pool.setAutostart(1)
-    pool.isActive()
+    # set storage pool active
+    pool.create()
     return pool
 
 
