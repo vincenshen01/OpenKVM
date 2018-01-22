@@ -16,7 +16,7 @@ def create_storage_pool(conn, name, path):
     </pool>""".format(name=name, path=path)
 
     # create a new persistent storage pool
-    pool = conn.storagePoolDefineXML(xmlDesc)
+    pool = conn.storagePoolCreateXML(xmlDesc)
 
     # set storage pool autostart
     pool.setAutostart(1)
