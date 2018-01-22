@@ -1,0 +1,85 @@
+一、 制作虚拟机镜像
+
+qemu-img create -f qcow2 CentOS1.qcow2 100G
+
+二、 编辑虚拟机配置文件centos.xml
+
+<domain type='kvm'>
+
+  2     <name>CentOS-UECCloud</name>                     //虚拟机名称
+
+  3     <memory unit='GiB'>4</memory>                  //最大内存
+
+  4     <currentMemory unit='GiB'>4</currentMemory>    //可用内存
+
+  5     <vcpu>4</vcpu>                                //虚拟cpu个数
+
+  6     <os>
+
+  7       <type arch='x86_64' machine='pc'>hvm</type>
+
+  8       <boot dev='cdrom'/>                        //光盘启动
+
+  9    </os>
+
+ 10    <features>
+
+ 11      <acpi/>
+
+ 12      <apic/>
+
+ 13      <pae/>
+
+ 14    </features>
+
+ 15    <clock offset='localtime'/>
+
+ 16    <on_poweroff>destroy</on_poweroff>
+
+ 17    <on_reboot>restart</on_reboot>
+
+ 18    <on_crash>destroy</on_crash>
+
+ 19    <devices>
+
+ 20      <emulator>/usr/libexec/qemu-kvm</emulator>
+
+ 21      <disk type='file' device='disk'>
+
+ 22       <driver name='qemu' type='qcow2'/>  //此处关键，要求libvirt版本至少应该在0.9以上才能支持，libvirt版本升级http://blog.csdn.net/gg296231363/ar    ticle/details/6891460
+
+ 23        <source file='/home/kvm/CentOS-UECCloud.qcow2'/>         //目的镜像路径
+
+ 24        <target dev='hda' bus='ide'/>
+
+ 25      </disk>
+
+ 26      <disk type='file' device='cdrom'>
+
+ 27        <source file='/root/CentOS-6.3-x86_64-bin-DVD1.iso'/>              //光盘镜像路径
+
+ 28        <target dev='hdb' bus='ide'/>
+
+ 29      </disk>
+
+ 30     <interface type='bridge'>                                               //虚拟机网络连接方式
+
+ 31       <source bridge='cloudbr0'/>
+
+ 32       <mac address="00:16:3e:5d:aa:a8"/>    //为虚拟机分配mac地址，务必唯一，否则dhcp获得同样ip,引起冲突
+
+ 33     </interface>
+
+ 34     <input type='mouse' bus='ps2'/>
+
+ 35      <graphics type='vnc' port='-1' autoport='yes' listen = '0.0.0.0' keymap='en-us'/>//vnc方式登录，端口号自动分配，自动加1
+
+ 36    </devices>
+
+ 37  </domain>
+
+定义域
+
+三、 Virsh define centos.xml
+
+四、 用virt-manager远程连接虚拟机
