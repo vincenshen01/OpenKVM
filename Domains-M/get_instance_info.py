@@ -1,7 +1,5 @@
 import libvirt
 import sys
-import os
-import pdb
 
 def usage():
    print('Usage: %s DOMAIN' % sys.argv[0])
@@ -50,7 +48,5 @@ print_entry("VCPUs:", info[3])
 # Read some info from the XML desc
 xmldesc = dom.XMLDesc(0)
 
-
 print_section("Devices")
-
 print(xmldesc)

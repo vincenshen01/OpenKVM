@@ -53,19 +53,18 @@ instance_xml = """
 """虚拟机配置文件路径：/etc/libvirt/qemu/**.xml"""
 
 
-def clone_volue_from_img(conn, img, xml):
-    storage_pool = conn.listAllStoragePools()
-    for storage in storage_pool:
-        for volume in storage.listAllVolumes():
-            if volume.name() == img:
-                # Clone the existing storage volume
-                new_volume = storage.createXMLFrom(xml, volume, 0)
-                if new_volume is not None:
-                    print('Clone IMG Success!')
-                    return new_volume.path()
-                else:
-                    print('Clone Error!')
-                    sys.exit(1)
+def clone_volume_from_img(conn, img, xml, storage_name):
+    storage_pool = conn.storagePoolLookupByName(storage_name)
+    for volume in storage_pool.listAllVolumes():
+        if volume.name() == img:
+            # Clone the existing storage volume
+            new_volume = storage_pool.createXMLFrom(xml, volume, 0)
+            if new_volume is not None:
+                print('Clone IMG Success!')
+                return new_volume.path()
+            else:
+                print('Clone Error!')
+                sys.exit(1)
 
 
 def create_instance(conn, instance_xml):
@@ -79,20 +78,22 @@ def create_instance(conn, instance_xml):
 
 
 if __name__ == '__main__':
-    kvm_server_ip = '172.16.65.130'
-    kvm_server_user = 'root'
-
+    kvm_ip = '172.16.65.130'
+    kvm_user = 'root'
+    kvm_storage_pool = 'nfsFile'
     # 使用libvirt.open的前提条件是需要实现Root无密码访问"""
-    conn = libvirt.open('qemu+ssh://{}@{}/system?socket=/var/run/libvirt/libvirt-sock'.format
-                        (kvm_server_user, kvm_server_ip))
+    conn = libvirt.open('qemu+ssh://{user}@{ip}/system?socket=/var/run/libvirt/libvirt-sock'.format(
+        user=kvm_user,
+        ip=kvm_user
+    ))
     if conn is None:
-        print('Failed to connect to {}'.format(kvm_server_ip), file=sys.stderr)
+        print('Failed to connect to {}'.format(kvm_ip), file=sys.stderr)
 
     # Instance Params
     instance_img = 'cirros-0.4.0-x86_64-disk.img'
     instance_img_space = 10  # GB
     instance_path = '/nfsFile/images'
-    instance_name = 'vm005'
+    instance_name = 'vm006'
     instance_network = 'brvlan100'
     instance_cpu = 1
     instance_memory = 1
@@ -102,7 +103,7 @@ if __name__ == '__main__':
     volume_xml = volume_xml.format(name=instance_name,
                                    capacity=instance_volume_capacity,
                                    path=instance_path)
-    volume_path = clone_volue_from_img(conn, instance_img, volume_xml)
+    volume_path = clone_volume_from_img(conn, instance_img, volume_xml, kvm_storage_pool)
 
     # Create Instance
     instance_xml = instance_xml.format(name=instance_name,

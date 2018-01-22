@@ -13,9 +13,11 @@ except libvirt.libvirtError:
 storages = conn.listAllStoragePools()
 
 for storage in storages:
-    # print(storage.name())
-    print(dir(storage))
-    print(storage.XMLDesc())
     print(storage.name())
-    print(storage.info())
-    print(storage.UUIDString())
+    print(dir(storage))
+    # print(storage.XMLDesc())
+    # print(storage.name())
+    # print(storage.info())
+    # print(storage.UUIDString())
+
+# storage_pool = conn.storagePoolLookupByName('nfsFile')
